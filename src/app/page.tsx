@@ -18,6 +18,7 @@ import {
   ShoppingBag,
   Users,
   Zap,
+  MonitorSmartphone,
 } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 
@@ -27,6 +28,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   "Barcode Scanners": ScanBarcode,
   "Cash Drawers": Wallet,
   "Card Readers": CreditCard,
+  "POS Software": MonitorSmartphone,
 }
 
 async function getCategories() {
@@ -62,6 +64,11 @@ async function getFeaturedProducts() {
       category: p.category.name,
       description: p.shortDesc || p.description.slice(0, 80),
       image: p.images[0] || null,
+      productType: p.productType,
+      softwareType: p.softwareType,
+      monthlyPrice: p.monthlyPrice ? Number(p.monthlyPrice) : null,
+      yearlyPrice: p.yearlyPrice ? Number(p.yearlyPrice) : null,
+      hasSubscription: p.hasSubscription,
     }))
   } catch {
     return []
@@ -274,13 +281,26 @@ export default async function Home() {
                     <span className="text-gray-400 text-sm">Image</span>
                   </div>
                   <div className="p-4">
-                    <p className="text-sm text-blue-600 mb-1">{product.category}</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm text-blue-600">{product.category}</p>
+                      {product.softwareType && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                          {product.softwareType === "cloud" ? "Cloud" : "On-Premise"}
+                        </span>
+                      )}
+                    </div>
                     <h3 className="font-semibold text-gray-900 mb-2">{product.name}</h3>
                     <p className="text-sm text-gray-500 mb-3">{product.description}</p>
                     <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold text-gray-900">{"\u00a3"}{product.price.toFixed(2)}</span>
-                      {product.comparePrice && (
-                        <span className="text-sm text-gray-400 line-through">{"\u00a3"}{product.comparePrice.toFixed(2)}</span>
+                      {product.hasSubscription ? (
+                        <span className="text-lg font-bold text-gray-900">From {"\u00a3"}{product.monthlyPrice?.toFixed(2)}/mo</span>
+                      ) : (
+                        <>
+                          <span className="text-lg font-bold text-gray-900">{"\u00a3"}{product.price.toFixed(2)}</span>
+                          {product.comparePrice && (
+                            <span className="text-sm text-gray-400 line-through">{"\u00a3"}{product.comparePrice.toFixed(2)}</span>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>

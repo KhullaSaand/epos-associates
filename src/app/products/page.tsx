@@ -12,14 +12,21 @@ interface Product {
   price: number
   comparePrice?: number
   category: string
+  categorySlug: string
   description: string
   stock: number
+  productType: string
+  softwareType?: string
+  monthlyPrice?: number
+  yearlyPrice?: number
+  hasSubscription: boolean
 }
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<string[]>(["All Categories"])
   const [selectedCategory, setSelectedCategory] = useState("All Categories")
+  const [selectedType, setSelectedType] = useState<"all" | "hardware" | "software">("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const { addItem } = useCart()
@@ -34,7 +41,6 @@ export default function ProductsPage() {
         setCategories(cats)
       })
       .catch(() => {
-        // Fallback to empty array if API not available
         setProducts([])
       })
   }, [])
@@ -43,10 +49,13 @@ export default function ProductsPage() {
     const matchesCategory =
       selectedCategory === "All Categories" ||
       product.category === selectedCategory
+    const matchesType =
+      selectedType === "all" ||
+      product.productType === selectedType
     const matchesSearch =
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.description.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesCategory && matchesSearch
+    return matchesCategory && matchesType && matchesSearch
   })
 
   const handleAddToCart = (e: React.MouseEvent, product: Product) => {
@@ -55,8 +64,11 @@ export default function ProductsPage() {
       id: product.id,
       name: product.name,
       slug: product.slug,
-      price: product.price,
+      price: product.hasSubscription ? (product.monthlyPrice || product.price) : product.price,
       category: product.category,
+      productType: product.productType as "hardware" | "software",
+      softwareType: product.softwareType as "cloud" | "on_premise" | undefined,
+      billingInterval: product.hasSubscription ? "monthly" : undefined,
     })
   }
 
@@ -66,7 +78,7 @@ export default function ProductsPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Products</h1>
           <p className="text-gray-600">
-            Browse our complete selection of POS hardware
+            Browse our complete selection of POS hardware and software
           </p>
         </div>
 
@@ -83,6 +95,26 @@ export default function ProductsPage() {
               />
             </div>
             <div className="flex gap-4">
+              <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setSelectedType("all")}
+                  className={`px-4 py-2 text-sm font-medium ${selectedType === "all" ? "bg-blue-600 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setSelectedType("hardware")}
+                  className={`px-4 py-2 text-sm font-medium ${selectedType === "hardware" ? "bg-blue-600 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                >
+                  Hardware
+                </button>
+                <button
+                  onClick={() => setSelectedType("software")}
+                  className={`px-4 py-2 text-sm font-medium ${selectedType === "software" ? "bg-blue-600 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                >
+                  Software
+                </button>
+              </div>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
@@ -135,25 +167,45 @@ export default function ProductsPage() {
                 <span className="text-gray-400 text-sm">Image</span>
               </div>
               <div className={`p-4 ${viewMode === "list" ? "flex-1" : ""}`}>
-                <p className="text-sm text-blue-600 mb-1">{product.category}</p>
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-sm text-blue-600">{product.category}</p>
+                  {product.softwareType && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                      {product.softwareType === "cloud" ? "Cloud" : "On-Premise"}
+                    </span>
+                  )}
+                </div>
                 <h3 className="font-semibold text-gray-900 mb-1">{product.name}</h3>
                 <p className="text-sm text-gray-500 mb-2">{product.description}</p>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-lg font-bold text-gray-900">
-                      {"\u00a3"}{product.price.toFixed(2)}
-                    </p>
-                    {product.comparePrice && (
-                      <p className="text-sm text-gray-400 line-through">
-                        {"\u00a3"}{product.comparePrice.toFixed(2)}
-                      </p>
+                    {product.hasSubscription ? (
+                      <div>
+                        <p className="text-lg font-bold text-gray-900">
+                          From {"\u00a3"}{product.monthlyPrice?.toFixed(2)}<span className="text-sm font-normal text-gray-500">/mo</span>
+                        </p>
+                        <p className="text-sm text-green-600">
+                          {"\u00a3"}{product.yearlyPrice?.toFixed(2)}/yr (Save {Math.round((1 - (product.yearlyPrice || 0) / ((product.monthlyPrice || 1) * 12)) * 100)}%)
+                        </p>
+                      </div>
+                    ) : (
+                      <div>
+                        <p className="text-lg font-bold text-gray-900">
+                          {"\u00a3"}{product.price.toFixed(2)}
+                        </p>
+                        {product.comparePrice && (
+                          <p className="text-sm text-gray-400 line-through">
+                            {"\u00a3"}{product.comparePrice.toFixed(2)}
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
                   <button
                     onClick={(e) => handleAddToCart(e, product)}
                     className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors opacity-0 group-hover:opacity-100"
                   >
-                    Add to Cart
+                    {product.hasSubscription ? "Subscribe" : "Add to Cart"}
                   </button>
                 </div>
               </div>

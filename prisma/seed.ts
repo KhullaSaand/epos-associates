@@ -51,6 +51,14 @@ const categories = [
     image: "/images/categories/pos-accessories.jpg",
     sortOrder: 6,
   },
+  {
+    name: "POS Software",
+    slug: "pos-software",
+    description:
+      "Cloud-based and on-premise POS software solutions for retail and hospitality businesses.",
+    image: "/images/categories/pos-software.jpg",
+    sortOrder: 7,
+  },
 ];
 
 interface ProductInput {
@@ -67,6 +75,12 @@ interface ProductInput {
   features: string[];
   categorySlug: string;
   isFeatured: boolean;
+  productType?: string;
+  softwareType?: string;
+  monthlyPrice?: number;
+  yearlyPrice?: number;
+  hasSubscription?: boolean;
+  trialDays?: number;
 }
 
 const products: ProductInput[] = [
@@ -519,6 +533,154 @@ const products: ProductInput[] = [
     categorySlug: "pos-accessories",
     isFeatured: false,
   },
+
+  // POS Software - Cloud Based
+  {
+    name: "RetailCloud POS",
+    slug: "retailcloud-pos",
+    description:
+      "RetailCloud POS is a powerful cloud-based point-of-sale system designed for retail businesses. Access your sales data from anywhere, manage inventory in real-time, and grow your business with built-in analytics. No hardware installation required — just log in and start selling.",
+    shortDesc: "Cloud-based POS system for retail businesses",
+    price: 99.99,
+    sku: "RC-POS",
+    stock: 9999,
+    images: ["/images/products/retailcloud-pos-1.jpg"],
+    specs: {
+      "Deployment": "Cloud-based (SaaS)",
+      "Access": "Web browser, iOS, Android apps",
+      "Updates": "Automatic (included)",
+      "Support": "24/7 email and phone",
+      "Data Storage": "Secure cloud backup",
+      "Integrations": "Accounting, e-commerce, payment gateways",
+    },
+    features: [
+      "Real-time sales tracking and reporting",
+      "Inventory management with low-stock alerts",
+      "Multi-store support from single dashboard",
+      "Customer loyalty programme built-in",
+      "Employee management and time tracking",
+      "Receipt printing and email receipts",
+      "Discount and promotion codes",
+      "Works on any device with a browser",
+    ],
+    categorySlug: "pos-software",
+    isFeatured: true,
+    productType: "software",
+    softwareType: "cloud",
+    monthlyPrice: 49.99,
+    yearlyPrice: 499.99,
+    hasSubscription: true,
+  },
+  {
+    name: "RestaurantCloud POS",
+    slug: "restaurantcloud-pos",
+    description:
+      "RestaurantCloud POS is a comprehensive cloud-based POS system built specifically for restaurants, cafes, and bars. Manage tables, orders, deliveries, and kitchen workflows all from one intuitive interface. Perfect for hospitality businesses that need speed and reliability.",
+    shortDesc: "Cloud-based POS system for restaurants and hospitality",
+    price: 119.99,
+    sku: "RestC-POS",
+    stock: 9999,
+    images: ["/images/products/restaurantcloud-pos-1.jpg"],
+    specs: {
+      "Deployment": "Cloud-based (SaaS)",
+      "Access": "Web browser, iOS, Android apps",
+      "Updates": "Automatic (included)",
+      "Support": "24/7 email and phone",
+      "Data Storage": "Secure cloud backup",
+      "Integrations": "Delivery platforms, accounting, reservations",
+    },
+    features: [
+      "Table management and floor plans",
+      "Kitchen order printing and display",
+      "Delivery management (Uber Eats, Deliveroo)",
+      "Reservation system integration",
+      "Menu management with modifiers and options",
+      "Split bills and partial payments",
+      "Real-time reporting and analytics",
+      "Staff scheduling and labour cost tracking",
+    ],
+    categorySlug: "pos-software",
+    isFeatured: true,
+    productType: "software",
+    softwareType: "cloud",
+    monthlyPrice: 59.99,
+    yearlyPrice: 599.99,
+    hasSubscription: true,
+  },
+
+  // POS Software - On-Premise
+  {
+    name: "RetailEdge POS",
+    slug: "retailedge-pos",
+    description:
+      "RetailEdge POS is a professional on-premise point-of-sale software installed directly on your hardware. Ideal for businesses that prefer full control over their data and don't require cloud access. One-time setup with ongoing monthly updates.",
+    shortDesc: "On-premise POS software for retail businesses",
+    price: 79.99,
+    sku: "RE-POS",
+    stock: 9999,
+    images: ["/images/products/retailedge-pos-1.jpg"],
+    specs: {
+      "Deployment": "On-premise (installed locally)",
+      "OS Required": "Windows 10/11 or Windows Server",
+      "Hardware": "Standard POS terminal or PC",
+      "Updates": "Monthly (included in subscription)",
+      "Support": "Business hours email and phone",
+      "Data Storage": "Local (with optional backup)",
+    },
+    features: [
+      "Full offline capability — no internet required",
+      "Fastest transaction processing speeds",
+      "Complete data ownership and privacy",
+      "Advanced inventory management",
+      "Multi-terminal support on local network",
+      "Customisable receipt templates",
+      "Barcode label printing",
+      "Detailed sales and tax reports",
+    ],
+    categorySlug: "pos-software",
+    isFeatured: false,
+    productType: "software",
+    softwareType: "on_premise",
+    monthlyPrice: 39.99,
+    yearlyPrice: 399.99,
+    hasSubscription: true,
+  },
+  {
+    name: "RestaurantEdge POS",
+    slug: "restaurantedge-pos",
+    description:
+      "RestaurantEdge POS is a robust on-premise POS solution for restaurants and hospitality venues. Installed directly on your equipment, it delivers lightning-fast performance with full offline support. Perfect for busy kitchens that can't afford internet downtime.",
+    shortDesc: "On-premise POS software for restaurants and hospitality",
+    price: 89.99,
+    sku: "RestE-POS",
+    stock: 9999,
+    images: ["/images/products/restaurantedge-pos-1.jpg"],
+    specs: {
+      "Deployment": "On-premise (installed locally)",
+      "OS Required": "Windows 10/11 or Windows Server",
+      "Hardware": "Standard POS terminal or PC",
+      "Updates": "Monthly (included in subscription)",
+      "Support": "Business hours email and phone",
+      "Data Storage": "Local (with optional backup)",
+    },
+    features: [
+      "Works 100% offline — no internet dependency",
+      "Table management with drag-and-drop layout",
+      "Kitchen display system (KDS) integration",
+      "Multi-course order management",
+      "Automatic delivery platform syncing",
+      "Inventory tracking with waste management",
+      "Staff performance and tip tracking",
+      "End-of-day reconciliation reports",
+    ],
+    categorySlug: "pos-software",
+    isFeatured: false,
+    productType: "software",
+    softwareType: "on_premise",
+    monthlyPrice: 49.99,
+    yearlyPrice: 499.99,
+    hasSubscription: true,
+  },
 ];
 
 async function main() {
@@ -576,6 +738,12 @@ async function main() {
         features: product.features,
         categoryId,
         isFeatured: product.isFeatured,
+        productType: product.productType ?? "hardware",
+        softwareType: product.softwareType ?? null,
+        monthlyPrice: product.monthlyPrice ?? null,
+        yearlyPrice: product.yearlyPrice ?? null,
+        hasSubscription: product.hasSubscription ?? false,
+        trialDays: product.trialDays ?? null,
       },
       create: {
         name: product.name,
@@ -591,6 +759,12 @@ async function main() {
         features: product.features,
         categoryId,
         isFeatured: product.isFeatured,
+        productType: product.productType ?? "hardware",
+        softwareType: product.softwareType ?? null,
+        monthlyPrice: product.monthlyPrice ?? null,
+        yearlyPrice: product.yearlyPrice ?? null,
+        hasSubscription: product.hasSubscription ?? false,
+        trialDays: product.trialDays ?? null,
       },
     });
     console.log(`  ✓ ${result.name} — $${result.price} (${result.id})`);

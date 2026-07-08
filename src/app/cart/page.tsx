@@ -5,7 +5,7 @@ import { Trash2, ShoppingBag, ArrowRight, Plus, Minus } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, subtotal } = useCart()
+  const { items, removeItem, updateQuantity, updateBillingInterval, subtotal } = useCart()
   const shipping = subtotal > 500 ? 0 : 49.99
   const total = subtotal + shipping
 
@@ -43,10 +43,46 @@ export default function CartPage() {
                     <span className="text-gray-400 text-xs">Image</span>
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-blue-600">{item.category}</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm text-blue-600">{item.category}</p>
+                      {item.softwareType && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                          {item.softwareType === "cloud" ? "Cloud" : "On-Premise"}
+                        </span>
+                      )}
+                    </div>
                     <h3 className="font-semibold text-gray-900">{item.name}</h3>
+                    {item.productType === "software" && item.billingInterval && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <button
+                          onClick={() => updateBillingInterval(item.id, "monthly")}
+                          className={`px-3 py-1 text-xs font-medium rounded ${
+                            item.billingInterval === "monthly"
+                              ? "bg-blue-600 text-white"
+                              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                          }`}
+                        >
+                          Monthly
+                        </button>
+                        <button
+                          onClick={() => updateBillingInterval(item.id, "yearly")}
+                          className={`px-3 py-1 text-xs font-medium rounded ${
+                            item.billingInterval === "yearly"
+                              ? "bg-blue-600 text-white"
+                              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                          }`}
+                        >
+                          Yearly
+                        </button>
+                      </div>
+                    )}
                     <p className="text-lg font-bold text-gray-900 mt-2">
                       {"\u00a3"}{item.price.toFixed(2)}
+                      {item.billingInterval && (
+                        <span className="text-sm font-normal text-gray-500">
+                          /{item.billingInterval === "monthly" ? "mo" : "yr"}
+                        </span>
+                      )}
                     </p>
                   </div>
                   <div className="flex flex-col items-end justify-between">
@@ -56,23 +92,25 @@ export default function CartPage() {
                     >
                       <Trash2 className="h-5 w-5" />
                     </button>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="p-1 rounded border border-gray-300 hover:bg-gray-100"
-                      >
-                        <Minus className="h-4 w-4" />
-                      </button>
-                      <span className="text-sm text-gray-600 w-8 text-center">
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="p-1 rounded border border-gray-300 hover:bg-gray-100"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </button>
-                    </div>
+                    {item.productType !== "software" && (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          className="p-1 rounded border border-gray-300 hover:bg-gray-100"
+                        >
+                          <Minus className="h-4 w-4" />
+                        </button>
+                        <span className="text-sm text-gray-600 w-8 text-center">
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          className="p-1 rounded border border-gray-300 hover:bg-gray-100"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

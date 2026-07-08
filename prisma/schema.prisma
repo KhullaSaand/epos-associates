@@ -24,6 +24,12 @@ model Product {
   category    Category @relation(fields: [categoryId], references: [id])
   isActive    Boolean  @default(true)
   isFeatured  Boolean  @default(false)
+  productType String   @default("hardware")
+  softwareType String?
+  monthlyPrice Decimal? @db.Decimal(10, 2)
+  yearlyPrice  Decimal? @db.Decimal(10, 2)
+  hasSubscription Boolean @default(false)
+  trialDays   Int?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   cartItems   CartItem[]
@@ -31,6 +37,7 @@ model Product {
 
   @@index([categoryId])
   @@index([isActive, isFeatured])
+  @@index([productType])
 }
 
 model Category {

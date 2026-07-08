@@ -10,6 +10,9 @@ interface CartItem {
   quantity: number
   category: string
   image?: string
+  productType: "hardware" | "software"
+  softwareType?: "cloud" | "on_premise"
+  billingInterval?: "monthly" | "yearly"
 }
 
 interface CartContextType {
@@ -17,6 +20,7 @@ interface CartContextType {
   addItem: (item: Omit<CartItem, "quantity">) => void
   removeItem: (id: string) => void
   updateQuantity: (id: string, quantity: number) => void
+  updateBillingInterval: (id: string, interval: "monthly" | "yearly") => void
   clearCart: () => void
   totalItems: number
   subtotal: number
@@ -53,6 +57,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     )
   }
 
+  const updateBillingInterval = (id: string, interval: "monthly" | "yearly") => {
+    setItems((prev) =>
+      prev.map((i) => (i.id === id ? { ...i, billingInterval: interval } : i))
+    )
+  }
+
   const clearCart = () => setItems([])
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
@@ -60,7 +70,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   return (
     <CartContext.Provider
-      value={{ items, addItem, removeItem, updateQuantity, clearCart, totalItems, subtotal }}
+      value={{ items, addItem, removeItem, updateQuantity, updateBillingInterval, clearCart, totalItems, subtotal }}
     >
       {children}
     </CartContext.Provider>

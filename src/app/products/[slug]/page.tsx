@@ -13,11 +13,18 @@ interface Product {
   price: number
   comparePrice?: number
   category: string
+  categorySlug: string
   sku: string
   stock: number
   description: string
   features: string[]
   specs: Record<string, string>
+  productType: string
+  softwareType?: string
+  monthlyPrice?: number
+  yearlyPrice?: number
+  hasSubscription: boolean
+  trialDays?: number
 }
 
 export default function ProductDetailPage() {
@@ -25,6 +32,7 @@ export default function ProductDetailPage() {
   const slug = params.slug as string
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
+  const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly">("monthly")
   const { addItem } = useCart()
 
   useEffect(() => {
@@ -61,14 +69,29 @@ export default function ProductDetailPage() {
   }
 
   const handleAddToCart = () => {
+    const price = product.hasSubscription
+      ? (billingInterval === "monthly" ? product.monthlyPrice : product.yearlyPrice) || product.price
+      : product.price
+
     addItem({
       id: product.id,
       name: product.name,
       slug: product.slug,
-      price: product.price,
+      price: price,
       category: product.category,
+      productType: product.productType as "hardware" | "software",
+      softwareType: product.softwareType as "cloud" | "on_premise" | undefined,
+      billingInterval: product.hasSubscription ? billingInterval : undefined,
     })
   }
+
+  const currentPrice = product.hasSubscription
+    ? (billingInterval === "monthly" ? product.monthlyPrice : product.yearlyPrice) || product.price
+    : product.price
+
+  const yearlySavings = product.hasSubscription && product.monthlyPrice && product.yearlyPrice
+    ? Math.round((1 - product.yearlyPrice / (product.monthlyPrice * 12)) * 100)
+    : 0
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -102,27 +125,87 @@ export default function ProductDetailPage() {
             </div>
 
             <div>
-              <p className="text-sm text-blue-600 mb-2">{product.category}</p>
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                {product.name}
-              </h1>
-              <div className="flex items-baseline gap-3 mb-4">
-                <span className="text-3xl font-bold text-gray-900">
-                  {"\u00a3"}{product.price.toFixed(2)}
-                </span>
-                {product.comparePrice && (
-                  <span className="text-lg text-gray-400 line-through">
-                    {"\u00a3"}{product.comparePrice.toFixed(2)}
+              <div className="flex items-center gap-2 mb-2">
+                <p className="text-sm text-blue-600">{product.category}</p>
+                {product.softwareType && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                    {product.softwareType === "cloud" ? "Cloud-Based" : "On-Premise"}
                   </span>
                 )}
               </div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                {product.name}
+              </h1>
+
+              {product.hasSubscription ? (
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <button
+                      onClick={() => setBillingInterval("monthly")}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        billingInterval === "monthly"
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                    >
+                      Monthly
+                    </button>
+                    <button
+                      onClick={() => setBillingInterval("yearly")}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        billingInterval === "yearly"
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                    >
+                      Yearly
+                    </button>
+                    {yearlySavings > 0 && (
+                      <span className="text-sm text-green-600 font-medium">
+                        Save {yearlySavings}%
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl font-bold text-gray-900">
+                      {"\u00a3"}{currentPrice.toFixed(2)}
+                    </span>
+                    <span className="text-lg text-gray-500">
+                      /{billingInterval === "monthly" ? "mo" : "yr"}
+                    </span>
+                  </div>
+                  {billingInterval === "yearly" && product.monthlyPrice && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      Equivalent to {"\u00a3"}{(product.yearlyPrice! / 12).toFixed(2)}/mo
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-baseline gap-3 mb-4">
+                  <span className="text-3xl font-bold text-gray-900">
+                    {"\u00a3"}{product.price.toFixed(2)}
+                  </span>
+                  {product.comparePrice && (
+                    <span className="text-lg text-gray-400 line-through">
+                      {"\u00a3"}{product.comparePrice.toFixed(2)}
+                    </span>
+                  )}
+                </div>
+              )}
+
               <p className="text-gray-600 mb-6">{product.description}</p>
 
               <div className="mb-6">
                 <p className="text-sm text-gray-500 mb-1">SKU: {product.sku}</p>
-                <p className={`text-sm font-medium ${product.stock > 0 ? "text-green-600" : "text-red-600"}`}>
-                  {product.stock > 0 ? `In Stock (${product.stock} available)` : "Out of Stock"}
-                </p>
+                {product.productType === "hardware" ? (
+                  <p className={`text-sm font-medium ${product.stock > 0 ? "text-green-600" : "text-red-600"}`}>
+                    {product.stock > 0 ? `In Stock (${product.stock} available)` : "Out of Stock"}
+                  </p>
+                ) : (
+                  <p className="text-sm font-medium text-green-600">
+                    Available Immediately
+                  </p>
+                )}
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 mb-8">
@@ -131,7 +214,7 @@ export default function ProductDetailPage() {
                   className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   <ShoppingCart className="h-5 w-5" />
-                  Add to Cart
+                  {product.hasSubscription ? "Subscribe Now" : "Add to Cart"}
                 </button>
                 <Link
                   href="/contact"

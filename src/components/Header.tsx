@@ -12,13 +12,16 @@ const navigation = [
     name: "Products",
     href: "/products",
     children: [
+      { name: "All Products", href: "/products" },
       { name: "POS Terminals", href: "/products?category=pos-terminals" },
       { name: "Receipt Printers", href: "/products?category=receipt-printers" },
       { name: "Barcode Scanners", href: "/products?category=barcode-scanners" },
       { name: "Cash Drawers", href: "/products?category=cash-drawers" },
       { name: "Card Readers", href: "/products?category=card-readers" },
+      { name: "POS Software", href: "/products?category=pos-software" },
     ],
   },
+  { name: "Software", href: "/products?category=pos-software" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
 ]
