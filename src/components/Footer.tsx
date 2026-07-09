@@ -2,7 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 
 const footerNavigation = {
-  products: [
+  hardware: [
     { name: "POS Terminals", href: "/products?category=pos-terminals" },
     { name: "Receipt Printers", href: "/products?category=receipt-printers" },
     { name: "Barcode Scanners", href: "/products?category=barcode-scanners" },
@@ -54,7 +54,7 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-white mb-4">Hardware</h3>
             <ul className="space-y-2">
-              {footerNavigation.products.map((item) => (
+              {footerNavigation.hardware.map((item) => (
                 <li key={item.name}>
                   <Link href={item.href} className="text-sm hover:text-white">
                     {item.name}

@@ -9,16 +9,15 @@ import { useCart } from "@/lib/cart-context"
 const navigation = [
   { name: "Home", href: "/" },
   {
-    name: "Products",
+    name: "Hardware",
     href: "/products",
     children: [
-      { name: "All Products", href: "/products" },
+      { name: "All Hardware", href: "/products" },
       { name: "POS Terminals", href: "/products?category=pos-terminals" },
       { name: "Receipt Printers", href: "/products?category=receipt-printers" },
       { name: "Barcode Scanners", href: "/products?category=barcode-scanners" },
       { name: "Cash Drawers", href: "/products?category=cash-drawers" },
       { name: "Card Readers", href: "/products?category=card-readers" },
-      { name: "POS Software", href: "/products?category=pos-software" },
     ],
   },
   { name: "Software", href: "/products?category=pos-software" },
