@@ -28,32 +28,31 @@ function ProductsContent() {
   const urlCategory = searchParams.get("category")
 
   const [products, setProducts] = useState<Product[]>([])
-  const [categories, setCategories] = useState<string[]>(["All Categories"])
-  const [selectedCategory, setSelectedCategory] = useState("All Categories")
-  const [selectedType, setSelectedType] = useState<"hardware" | "software">(
-    urlCategory === "pos-software" ? "software" : "hardware"
-  )
+  const [categories, setCategories] = useState<string[]>([])
+  const [selectedCategory, setSelectedCategory] = useState("All")
+  const [selectedType, setSelectedType] = useState<"hardware" | "software">("hardware")
   const [searchQuery, setSearchQuery] = useState("")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const { addItem } = useCart()
 
   useEffect(() => {
-    if (urlCategory) {
-      if (urlCategory === "pos-software") {
-        setSelectedType("software")
-        setSelectedCategory("POS Software")
-      } else {
-        setSelectedType("hardware")
-        const categoryMap: Record<string, string> = {
-          "pos-terminals": "POS Terminals",
-          "receipt-printers": "Receipt Printers",
-          "barcode-scanners": "Barcode Scanners",
-          "cash-drawers": "Cash Drawers",
-          "card-readers": "Card Readers",
-          "pos-accessories": "POS Accessories",
-        }
-        setSelectedCategory(categoryMap[urlCategory] || "All Categories")
+    if (urlCategory === "pos-software") {
+      setSelectedType("software")
+      setSelectedCategory("All")
+    } else if (urlCategory) {
+      setSelectedType("hardware")
+      const categoryMap: Record<string, string> = {
+        "pos-terminals": "POS Terminals",
+        "receipt-printers": "Receipt Printers",
+        "barcode-scanners": "Barcode Scanners",
+        "cash-drawers": "Cash Drawers",
+        "card-readers": "Card Readers",
+        "pos-accessories": "POS Accessories",
       }
+      setSelectedCategory(categoryMap[urlCategory] || "All")
+    } else {
+      setSelectedType("hardware")
+      setSelectedCategory("All")
     }
   }, [urlCategory])
 
@@ -63,12 +62,10 @@ function ProductsContent() {
       .then((data: { products?: Product[] }) => {
         const prods = data.products || []
         setProducts(prods)
-        const hwCats = prods.filter((p) => p.productType === "hardware").map((p) => p.category)
-        const swCats = prods.filter((p) => p.productType === "software").map((p) => p.category)
-        const allCats = selectedType === "software" 
-          ? ["All Software", ...Array.from(new Set(swCats))]
-          : ["All Hardware", ...Array.from(new Set(hwCats))]
-        setCategories(allCats)
+        const filteredCats = prods
+          .filter((p) => p.productType === selectedType)
+          .map((p) => p.category)
+        setCategories(["All", ...Array.from(new Set(filteredCats))])
       })
       .catch(() => {
         setProducts([])
@@ -77,20 +74,12 @@ function ProductsContent() {
 
   const filteredProducts = products.filter((product) => {
     const matchesType = product.productType === selectedType
-    const matchesCategory =
-      (selectedType === "software" && selectedCategory === "All Software") ||
-      (selectedType === "hardware" && selectedCategory === "All Hardware") ||
-      product.category === selectedCategory
+    const matchesCategory = selectedCategory === "All" || product.category === selectedCategory
     const matchesSearch =
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.description.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesType && matchesCategory && matchesSearch
   })
-
-  const handleTypeChange = (type: "hardware" | "software") => {
-    setSelectedType(type)
-    setSelectedCategory(type === "software" ? "All Software" : "All Hardware")
-  }
 
   const handleAddToCart = (e: React.MouseEvent, product: Product) => {
     e.preventDefault()
@@ -126,27 +115,13 @@ function ProductsContent() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
-                placeholder={`Search ${selectedType}...`}
+                placeholder={`Search ${selectedType === "software" ? "software" : "hardware"}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div className="flex gap-4">
-              <div className="flex border border-gray-300 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => handleTypeChange("hardware")}
-                  className={`px-4 py-2 text-sm font-medium ${selectedType === "hardware" ? "bg-blue-600 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
-                >
-                  Hardware
-                </button>
-                <button
-                  onClick={() => handleTypeChange("software")}
-                  className={`px-4 py-2 text-sm font-medium ${selectedType === "software" ? "bg-blue-600 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
-                >
-                  Software
-                </button>
-              </div>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
