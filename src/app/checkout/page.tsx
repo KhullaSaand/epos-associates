@@ -2,16 +2,9 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { ArrowLeft, Lock, CreditCard, Truck, CheckCircle, Loader2 } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
-
-function generateOrderNumber(): string {
-  const now = new Date()
-  const date = now.toISOString().slice(2, 10).replace(/-/g, "")
-  const random = Math.floor(Math.random() * 9000 + 1000)
-  return `EA-${date}-${random}`
-}
 
 export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCart()
@@ -40,37 +33,36 @@ export default function CheckoutPage() {
   const [orderNumber, setOrderNumber] = useState("")
   const [orderTotal, setOrderTotal] = useState(0)
   const [checkingOrder, setCheckingOrder] = useState(true)
+  const processedRef = useRef(false)
 
-  const handleOrderDetection = useCallback(async () => {
+  useEffect(() => {
+    if (processedRef.current) return
+
     const params = new URLSearchParams(window.location.search)
     const sessionId = params.get("session_id")
 
     if (sessionId) {
-      setCheckingOrder(true)
-      const num = generateOrderNumber()
+      processedRef.current = true
+      const now = new Date()
+      const date = now.toISOString().slice(2, 10).replace(/-/g, "")
+      const seq = now.getHours().toString().padStart(2, "0") + now.getMinutes().toString().padStart(2, "0") + now.getSeconds().toString().padStart(2, "0")
+      const num = `EA-${date}-${seq}`
+      
       setOrderNumber(num)
       setOrderTotal(0)
       setOrderPlaced(true)
-      clearCart()
       setCheckingOrder(false)
+      clearCart()
 
-      try {
-        await fetch("/api/orders", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ session_id: sessionId, orderNumber: num }),
-        })
-      } catch {
-        // Order save failed, but we still show confirmation
-      }
+      fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId, orderNumber: num }),
+      }).catch(() => {})
     } else {
       setCheckingOrder(false)
     }
   }, [clearCart])
-
-  useEffect(() => {
-    handleOrderDetection()
-  }, [handleOrderDetection])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
