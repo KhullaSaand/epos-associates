@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { useState, useEffect } from "react"
-import { ArrowLeft, Lock, CreditCard, Truck, CheckCircle } from "lucide-react"
+import { ArrowLeft, Lock, CreditCard, Truck, CheckCircle, Loader2 } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 
 export default function CheckoutPage() {
@@ -32,13 +32,18 @@ export default function CheckoutPage() {
   const [error, setError] = useState("")
   const [orderNumber, setOrderNumber] = useState("")
   const [orderTotal, setOrderTotal] = useState(0)
+  const [checkingOrder, setCheckingOrder] = useState(true)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const sessionId = params.get("session_id")
     if (sessionId) {
+      setCheckingOrder(true)
       fetch(`/api/orders?session_id=${sessionId}`)
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to fetch order")
+          return res.json()
+        })
         .then((data) => {
           if (data.orderNumber) {
             setOrderNumber(data.orderNumber)
@@ -48,10 +53,15 @@ export default function CheckoutPage() {
           }
         })
         .catch(() => {
-          setOrderNumber(`EA-${Date.now().toString().slice(-8)}`)
+          setOrderNumber("Order received")
           setOrderPlaced(true)
           clearCart()
         })
+        .finally(() => {
+          setCheckingOrder(false)
+        })
+    } else {
+      setCheckingOrder(false)
     }
   }, [clearCart])
 
@@ -103,6 +113,17 @@ export default function CheckoutPage() {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.")
       setProcessing(false)
     }
+  }
+
+  if (checkingOrder) {
+    return (
+      <div className="bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 text-blue-600 mx-auto mb-4 animate-spin" />
+          <p className="text-gray-600">Processing your order...</p>
+        </div>
+      </div>
+    )
   }
 
   if (items.length === 0 && !orderPlaced) {
@@ -382,7 +403,7 @@ export default function CheckoutPage() {
                 >
                   {processing ? (
                     <>
-                      <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <Loader2 className="h-5 w-5 animate-spin" />
                       Redirecting to Stripe...
                     </>
                   ) : (
