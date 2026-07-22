@@ -69,6 +69,7 @@ model CartItem {
 
 model Order {
   id            String      @id @default(cuid())
+  orderNumber   String      @unique
   sessionId     String
   email         String
   phone         String?
@@ -80,13 +81,14 @@ model Order {
   city          String
   state         String
   zipCode       String
-  country       String     @default("US")
+  country       String     @default("GB")
   status        OrderStatus @default(PENDING)
   subtotal      Decimal    @db.Decimal(10, 2)
   tax           Decimal    @db.Decimal(10, 2) @default(0)
   shipping      Decimal    @db.Decimal(10, 2) @default(0)
   total         Decimal    @db.Decimal(10, 2)
   stripePaymentId String?
+  stripeSessionId String?
   notes         String?
   items         OrderItem[]
   createdAt     DateTime   @default(now())
@@ -94,6 +96,7 @@ model Order {
 
   @@index([sessionId])
   @@index([status])
+  @@index([orderNumber])
 }
 
 model OrderItem {

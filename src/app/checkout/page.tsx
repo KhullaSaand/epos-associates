@@ -30,12 +30,28 @@ export default function CheckoutPage() {
   const [orderPlaced, setOrderPlaced] = useState(false)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState("")
+  const [orderNumber, setOrderNumber] = useState("")
+  const [orderTotal, setOrderTotal] = useState(0)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    if (params.get("session_id")) {
-      setOrderPlaced(true)
-      clearCart()
+    const sessionId = params.get("session_id")
+    if (sessionId) {
+      fetch(`/api/orders?session_id=${sessionId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.orderNumber) {
+            setOrderNumber(data.orderNumber)
+            setOrderTotal(data.total)
+            setOrderPlaced(true)
+            clearCart()
+          }
+        })
+        .catch(() => {
+          setOrderNumber(`EA-${Date.now().toString().slice(-8)}`)
+          setOrderPlaced(true)
+          clearCart()
+        })
     }
   }, [clearCart])
 
@@ -115,9 +131,14 @@ export default function CheckoutPage() {
           <p className="text-gray-600 mb-4">
             Thank you for your order. A confirmation has been sent to your email.
           </p>
-          <p className="text-sm text-gray-500 mb-8">
-            Order reference: <strong>EA-{Date.now().toString().slice(-8)}</strong>
+          <p className="text-sm text-gray-500 mb-2">
+            Order reference: <strong>{orderNumber}</strong>
           </p>
+          {orderTotal > 0 && (
+            <p className="text-sm text-gray-500 mb-8">
+              Total charged: <strong>{"\u00a3"}{orderTotal.toFixed(2)}</strong>
+            </p>
+          )}
           <Link
             href="/products"
             className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
