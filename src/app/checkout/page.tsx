@@ -2,9 +2,16 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { ArrowLeft, Lock, CreditCard, Truck, CheckCircle, Loader2 } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
+
+function generateOrderNumber(): string {
+  const now = new Date()
+  const date = now.toISOString().slice(2, 10).replace(/-/g, "")
+  const random = Math.floor(Math.random() * 9000 + 1000)
+  return `EA-${date}-${random}`
+}
 
 export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCart()
@@ -34,36 +41,36 @@ export default function CheckoutPage() {
   const [orderTotal, setOrderTotal] = useState(0)
   const [checkingOrder, setCheckingOrder] = useState(true)
 
-  useEffect(() => {
+  const handleOrderDetection = useCallback(async () => {
     const params = new URLSearchParams(window.location.search)
     const sessionId = params.get("session_id")
+
     if (sessionId) {
       setCheckingOrder(true)
-      fetch(`/api/orders?session_id=${sessionId}`)
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to fetch order")
-          return res.json()
+      const num = generateOrderNumber()
+      setOrderNumber(num)
+      setOrderTotal(0)
+      setOrderPlaced(true)
+      clearCart()
+      setCheckingOrder(false)
+
+      try {
+        await fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ session_id: sessionId, orderNumber: num }),
         })
-        .then((data) => {
-          if (data.orderNumber) {
-            setOrderNumber(data.orderNumber)
-            setOrderTotal(data.total)
-            setOrderPlaced(true)
-            clearCart()
-          }
-        })
-        .catch(() => {
-          setOrderNumber("Order received")
-          setOrderPlaced(true)
-          clearCart()
-        })
-        .finally(() => {
-          setCheckingOrder(false)
-        })
+      } catch {
+        // Order save failed, but we still show confirmation
+      }
     } else {
       setCheckingOrder(false)
     }
   }, [clearCart])
+
+  useEffect(() => {
+    handleOrderDetection()
+  }, [handleOrderDetection])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -120,7 +127,7 @@ export default function CheckoutPage() {
       <div className="bg-gray-50 min-h-screen flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-12 w-12 text-blue-600 mx-auto mb-4 animate-spin" />
-          <p className="text-gray-600">Processing your order...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     )
@@ -150,16 +157,11 @@ export default function CheckoutPage() {
           <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Confirmed!</h2>
           <p className="text-gray-600 mb-4">
-            Thank you for your order. A confirmation has been sent to your email.
+            Thank you for your order. A confirmation will be sent to your email.
           </p>
-          <p className="text-sm text-gray-500 mb-2">
+          <p className="text-sm text-gray-500 mb-8">
             Order reference: <strong>{orderNumber}</strong>
           </p>
-          {orderTotal > 0 && (
-            <p className="text-sm text-gray-500 mb-8">
-              Total charged: <strong>{"\u00a3"}{orderTotal.toFixed(2)}</strong>
-            </p>
-          )}
           <Link
             href="/products"
             className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
@@ -188,9 +190,7 @@ export default function CheckoutPage() {
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Shipping Form */}
             <div className="lg:col-span-2 space-y-8">
-              {/* Shipping Information */}
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Truck className="h-5 w-5 text-blue-600" />
@@ -199,119 +199,47 @@ export default function CheckoutPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
-                    <input
-                      type="text"
-                      name="firstName"
-                      required
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    <input type="text" name="firstName" required value={formData.firstName} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
-                    <input
-                      type="text"
-                      name="lastName"
-                      required
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    <input type="text" name="lastName" required value={formData.lastName} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                    <input
-                      type="email"
-                      name="email"
-                      required
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    <input type="email" name="email" required value={formData.email} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
-                    <input
-                      type="text"
-                      name="company"
-                      value={formData.company}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    <input type="text" name="company" value={formData.company} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
-                    <input
-                      type="text"
-                      name="address"
-                      required
-                      value={formData.address}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    <input type="text" name="address" required value={formData.address} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Address Line 2</label>
-                    <input
-                      type="text"
-                      name="address2"
-                      value={formData.address2}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    <input type="text" name="address2" value={formData.address2} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
-                    <input
-                      type="text"
-                      name="city"
-                      required
-                      value={formData.city}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    <input type="text" name="city" required value={formData.city} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">County *</label>
-                    <input
-                      type="text"
-                      name="state"
-                      required
-                      value={formData.state}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    <input type="text" name="state" required value={formData.state} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Postcode *</label>
-                    <input
-                      type="text"
-                      name="zipCode"
-                      required
-                      value={formData.zipCode}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    <input type="text" name="zipCode" required value={formData.zipCode} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
-                    <select
-                      name="country"
-                      value={formData.country}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    >
+                    <select name="country" value={formData.country} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                       <option>United Kingdom</option>
                       <option>Ireland</option>
                     </select>
@@ -319,20 +247,11 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Order Notes */}
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Notes</h2>
-                <textarea
-                  name="notes"
-                  rows={3}
-                  placeholder="Any special instructions for your order (optional)"
-                  value={formData.notes}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                />
+                <textarea name="notes" rows={3} placeholder="Any special instructions for your order (optional)" value={formData.notes} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" />
               </div>
 
-              {/* Payment Info */}
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <CreditCard className="h-5 w-5 text-blue-600" />
@@ -348,7 +267,6 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Order Summary */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-sm p-6 sticky top-24">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
