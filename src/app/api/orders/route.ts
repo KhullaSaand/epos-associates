@@ -88,7 +88,7 @@ export async function GET(request: Request) {
         stripeSessionId: sessionId,
         items: {
           create: lineItems.data.map((item) => ({
-            productId: "placeholder",
+            name: item.description || item.description || "Product",
             quantity: item.quantity || 1,
             price: (item.amount_subtotal || 0) / 100 / (item.quantity || 1),
           })),
