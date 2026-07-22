@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import { ArrowLeft, ShoppingCart, Phone, Check } from "lucide-react"
@@ -95,6 +96,34 @@ export default function ProductDetailPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen">
+      {/* Product Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: product.name,
+            description: product.description,
+            sku: product.sku,
+            brand: { "@type": "Brand", name: "EPOS Associates" },
+            offers: {
+              "@type": "Offer",
+              priceCurrency: "GBP",
+              price: product.hasSubscription
+                ? billingInterval === "monthly"
+                  ? product.monthlyPrice
+                  : product.yearlyPrice
+                : product.price,
+              availability: product.stock > 0
+                ? "https://schema.org/InStock"
+                : "https://schema.org/OutOfStock",
+              seller: { "@type": "Organization", name: "EPOS Associates" },
+            },
+          }),
+        }}
+      />
+
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
           <Link
@@ -110,7 +139,7 @@ export default function ProductDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 lg:p-8">
             <div className="space-y-4">
               <div className="bg-gray-100 rounded-lg h-96 flex items-center justify-center">
-                <span className="text-gray-400">Product Image</span>
+                <Image src="/EA2.svg" alt={product.name} width={160} height={64} className="opacity-60" />
               </div>
               <div className="grid grid-cols-4 gap-2">
                 {[1, 2, 3, 4].map((i) => (
@@ -118,7 +147,7 @@ export default function ProductDetailPage() {
                     key={i}
                     className="bg-gray-100 rounded-lg h-20 flex items-center justify-center"
                   >
-                    <span className="text-gray-400 text-xs">Thumb {i}</span>
+                    <Image src="/EA2.svg" alt={`${product.name} thumbnail ${i}`} width={40} height={16} className="opacity-60" />
                   </div>
                 ))}
               </div>

@@ -1,4 +1,17 @@
+import Image from "next/image"
 import { CheckCircle } from "lucide-react"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "About Us | EPOS Associates",
+  description:
+    "Learn about EPOS Associates - your trusted partner for POS hardware solutions since 2010. Over 15 years serving 5,000+ businesses across the UK.",
+  openGraph: {
+    title: "About EPOS Associates | POS Hardware Solutions",
+    description:
+      "Your trusted partner for POS hardware solutions since 2010. Serving 5,000+ businesses across the UK.",
+  },
+}
 
 const values = [
   {
@@ -69,7 +82,7 @@ export default function AboutPage() {
               </p>
             </div>
             <div className="bg-gray-100 rounded-lg h-80 flex items-center justify-center">
-              <span className="text-gray-400">Company Image</span>
+              <Image src="/EA2.svg" alt="EPOS Associates" width={160} height={64} className="opacity-40" />
             </div>
           </div>
         </div>

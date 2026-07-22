@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Trash2, ShoppingBag, ArrowRight, Plus, Minus } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
 
@@ -40,7 +41,7 @@ export default function CartPage() {
                   className="bg-white rounded-lg shadow-sm p-4 flex gap-4"
                 >
                   <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
-                    <span className="text-gray-400 text-xs">Image</span>
+                    <Image src="/EA2.svg" alt={item.name} width={60} height={24} className="opacity-60" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">

@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Search, Grid, List } from "lucide-react"
@@ -171,7 +172,7 @@ function ProductsContent() {
                   viewMode === "list" ? "w-48 h-48" : "h-48"
                 }`}
               >
-                <span className="text-gray-400 text-sm">Image</span>
+                <Image src="/EA2.svg" alt={product.name} width={80} height={32} className="opacity-60" />
               </div>
               <div className={`p-4 ${viewMode === "list" ? "flex-1" : ""}`}>
                 <div className="flex items-center gap-2 mb-1">

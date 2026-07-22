@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, ReactNode } from "react"
 
 interface CartItem {
   id: string
@@ -27,9 +27,29 @@ interface CartContextType {
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
+const CART_STORAGE_KEY = "epos-cart"
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(CART_STORAGE_KEY)
+      if (saved) {
+        setItems(JSON.parse(saved))
+      }
+    } catch {
+      // Ignore parse errors
+    }
+    setLoaded(true)
+  }, [])
+
+  useEffect(() => {
+    if (loaded) {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items))
+    }
+  }, [items, loaded])
 
   const addItem = (item: Omit<CartItem, "quantity">) => {
     setItems((prev) => {

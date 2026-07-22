@@ -12,9 +12,12 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "EPOS Associates | POS Hardware Solutions for Business",
+  title: {
+    default: "EPOS Associates | POS Hardware Solutions for Business",
+    template: "%s | EPOS Associates",
+  },
   description:
-    "Your trusted partner for POS hardware solutions. Quality point-of-sale terminals, receipt printers, barcode scanners, and more for businesses of all sizes.",
+    "Your trusted partner for POS hardware solutions. Quality point-of-sale terminals, receipt printers, barcode scanners, and more for businesses of all sizes across the UK.",
   keywords: [
     "POS hardware",
     "point of sale",
@@ -23,7 +26,17 @@ export const metadata: Metadata = {
     "barcode scanners",
     "cash drawers",
     "card readers",
+    "POS software",
   ],
+  openGraph: {
+    type: "website",
+    locale: "en_GB",
+    siteName: "EPOS Associates",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

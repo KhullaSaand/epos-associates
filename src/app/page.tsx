@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import {
   Monitor,
   Printer,
@@ -21,6 +22,7 @@ import {
   MonitorSmartphone,
 } from "lucide-react"
 import { prisma } from "@/lib/prisma"
+import ConsultationForm from "@/components/ConsultationForm"
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   "POS Terminals": Monitor,
@@ -163,6 +165,36 @@ export default async function Home() {
 
   return (
     <div>
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "EPOS Associates",
+            url: "https://eposassociates.com",
+            logo: "https://eposassociates.com/EA2.svg",
+            description:
+              "Your trusted partner for POS hardware solutions. Quality point-of-sale terminals, receipt printers, barcode scanners, and more.",
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: "123 Business Street, Suite 100",
+              addressLocality: "London",
+              postalCode: "EC1A 1BB",
+              addressCountry: "GB",
+            },
+            contactPoint: {
+              "@type": "ContactPoint",
+              telephone: "+44-1234-567890",
+              contactType: "sales",
+              email: "contact@eposassociates.com",
+            },
+            sameAs: [],
+          }),
+        }}
+      />
+
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-blue-600 to-blue-800 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
@@ -278,7 +310,7 @@ export default async function Home() {
                   className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
                 >
                   <div className="h-48 bg-gray-100 flex items-center justify-center">
-                    <span className="text-gray-400 text-sm">Image</span>
+                    <Image src="/EA2.svg" alt={product.name} width={100} height={40} className="opacity-60" />
                   </div>
                   <div className="p-4">
                     <div className="flex items-center gap-2 mb-1">
@@ -426,34 +458,7 @@ export default async function Home() {
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
               <h3 className="text-xl font-semibold mb-6">Request a Free Consultation</h3>
-              <form className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Your Name"
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white/50"
-                />
-                <input
-                  type="email"
-                  placeholder="Email Address"
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white/50"
-                />
-                <input
-                  type="tel"
-                  placeholder="Phone Number"
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white/50"
-                />
-                <textarea
-                  placeholder="Tell us about your requirements"
-                  rows={3}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white/50 resize-none"
-                />
-                <button
-                  type="submit"
-                  className="w-full px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition-colors"
-                >
-                  Send Enquiry
-                </button>
-              </form>
+              <ConsultationForm />
             </div>
           </div>
         </div>
