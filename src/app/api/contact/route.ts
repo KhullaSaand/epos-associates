@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       },
     })
 
-    const notificationEmail = process.env.NOTIFICATION_EMAIL || "contact@eposassociates.com"
+    const notificationEmail = process.env.NOTIFICATION_EMAIL || "info@eposassociates.co.uk"
     const notification = buildContactEmail({ name, email, phone, company, subject, message })
     await sendEmail({
       to: notificationEmail,

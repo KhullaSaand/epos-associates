@@ -46,8 +46,8 @@ export default function Footer() {
               <a href="tel:+441234567890" className="text-sm hover:text-white">
                 +44 1234 567890
               </a>
-              <a href="mailto:contact@eposassociates.com" className="text-sm hover:text-white">
-                contact@eposassociates.com
+              <a href="mailto:info@eposassociates.co.uk" className="text-sm hover:text-white">
+                info@eposassociates.co.uk
               </a>
             </div>
           </div>

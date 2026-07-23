@@ -113,7 +113,7 @@ export default function ShippingPage() {
                 Contact Us
               </Link>
               <a
-                href="mailto:support@eposassociates.com"
+                href="mailto:info@eposassociates.co.uk"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:border-gray-400 transition-colors"
               >
                 Email Support

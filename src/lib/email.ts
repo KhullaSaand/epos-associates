@@ -135,7 +135,7 @@ export function buildAutoReplyEmail(data: { name: string; email: string; subject
           <p>Kind regards,<br><strong>EPOS Associates Team</strong></p>
         </div>
         <div class="footer">
-          EPOS Associates | 123 Business Street, Suite 100, London EC1A 1BB
+          EPOS Associates | 128 City Road, London EC1V 2NX, United Kingdom
         </div>
       </div>
     </body>

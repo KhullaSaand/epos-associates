@@ -56,10 +56,10 @@ export default function HelpPage() {
               <p className="text-sm text-gray-600">+44 1234 567890</p>
               <p className="text-xs text-gray-500 mt-1">Mon-Fri 9am-6pm GMT</p>
             </a>
-            <a href="mailto:support@eposassociates.com" className="bg-white rounded-xl p-6 text-center hover:shadow-md transition-shadow">
+            <a href="mailto:info@eposassociates.co.uk" className="bg-white rounded-xl p-6 text-center hover:shadow-md transition-shadow">
               <Mail className="h-10 w-10 text-blue-600 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-1">Email Support</h3>
-              <p className="text-sm text-gray-600">support@eposassociates.com</p>
+              <p className="text-sm text-gray-600">info@eposassociates.co.uk</p>
               <p className="text-xs text-gray-500 mt-1">Response within 24 hours</p>
             </a>
             <Link href="/contact" className="bg-white rounded-xl p-6 text-center hover:shadow-md transition-shadow">

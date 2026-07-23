@@ -61,7 +61,7 @@ export default function ReturnsPage() {
                   <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold shrink-0">1</div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">Contact Us</h3>
-                    <p className="text-sm text-gray-600">Email support@eposassociates.com with your order number and reason for return.</p>
+                    <p className="text-sm text-gray-600">Email info@eposassociates.co.uk with your order number and reason for return.</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
@@ -127,7 +127,7 @@ export default function ReturnsPage() {
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Ready to Start a Return?</h3>
             <p className="text-gray-600 mb-4">Contact our support team and we&apos;ll guide you through the process.</p>
             <a
-              href="mailto:support@eposassociates.com?subject=Return Request"
+              href="mailto:info@eposassociates.co.uk?subject=Return Request"
               className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
             >
               <RotateCcw className="h-5 w-5" />

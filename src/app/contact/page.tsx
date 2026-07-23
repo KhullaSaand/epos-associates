@@ -64,16 +64,18 @@ export default function ContactPage() {
             <div className="bg-white rounded-lg shadow-sm p-6">
               <Mail className="h-8 w-8 text-blue-600 mb-4" />
               <h3 className="font-semibold text-gray-900 mb-2">Email</h3>
-              <p className="text-gray-600">contact@eposassociates.com</p>
+              <p className="text-gray-600">info@eposassociates.co.uk</p>
               <p className="text-sm text-gray-500">We respond within 24 hours</p>
             </div>
             <div className="bg-white rounded-lg shadow-sm p-6">
               <MapPin className="h-8 w-8 text-blue-600 mb-4" />
               <h3 className="font-semibold text-gray-900 mb-2">Office</h3>
               <p className="text-gray-600">
-                123 Business Street, Suite 100
+                128 City Road
                 <br />
-                London, EC1A 1BB
+                London, EC1V 2NX
+                <br />
+                United Kingdom
               </p>
             </div>
           </div>
